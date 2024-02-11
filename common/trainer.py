@@ -1,6 +1,7 @@
 import torch
 from tqdm import tqdm
 from config.config import ConfigV1
+from time import time
 
 def per_epoch(config: ConfigV1, model: torch.nn.Module, optimizer:torch.optim.Optimizer, dl, train=True, enable_tqdm=True):
     total_batches = len(dl)
@@ -9,6 +10,7 @@ def per_epoch(config: ConfigV1, model: torch.nn.Module, optimizer:torch.optim.Op
     total_loss = 0
     c = 1
     for i, batch in _iter:
+        strt_time = time()
         step_prc = int(i/(total_batches) * 100)
         x, y = batch[0].to(config.device), batch[1].to(config.device)
         if train:
@@ -27,7 +29,7 @@ def per_epoch(config: ConfigV1, model: torch.nn.Module, optimizer:torch.optim.Op
             _iter.set_description(log)
         else:
             if step_prc != c and step_prc % config.trainer_config.step_perc_v == 0:
-                print(f"step({step_prc}%) :{log}")
+                print(f"step({step_prc}%) :{log}, step time: {time() - strt_time}")
                 c = step_prc
     
     return total_loss/len(dl)
