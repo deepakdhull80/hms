@@ -25,7 +25,7 @@ def per_epoch(config: ConfigV1, model: torch.nn.Module, optimizer:torch.optim.Op
         if enable_tqdm:
             _iter.set_description(log)
         else:
-            if step_prc % config.step_perc_v == 0:
+            if step_prc % config.trainer_config.step_perc_v == 0:
                 print(f"step({step_prc}%) :{log}")
     
     return total_loss/len(dl)
