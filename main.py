@@ -45,7 +45,7 @@ def training_env(train_df, val_df, env_no=1):
 def run(args):
     config.data.data_prefix = args.data_path if args.data_path else config.data.data_prefix
     config.device = torch.device(args.device)
-    config.trainer_config.tqdm = args.tqdm
+    config.trainer_config.tqdm = (args.tqdm.lower())
     config.trainer_config.epoch = args.epoch
     config.trainer_config.batch_size = args.batch_size
     
