@@ -14,6 +14,7 @@ config = ConfigV1
 def parser():
     parser = argparse.ArgumentParser()
     parser.add_argument("--data_path", default=None)
+    parser.add_argument("--device", default="cpu")
     return parser.parse_args()
 
 def training_env(train_df, val_df, env_no=1):
@@ -39,6 +40,8 @@ def training_env(train_df, val_df, env_no=1):
 
 def run(args):
     config.data.data_prefix = args.data_path if args.data_path else config.data.data_prefix
+    config.device = torch.device(args.device)
+    
     df = pd.read_csv(os.path.join(config.data.data_prefix, config.data.meta_file_name))
     train, val = train_test_split(df, train_size=config.trainer_config.train_size)    
     training_env(train, val, env_no=0)
