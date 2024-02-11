@@ -3,10 +3,10 @@ from tqdm import tqdm
 from config.config import ConfigV1
 
 def per_epoch(config: ConfigV1, model: torch.nn.Module, optimizer:torch.optim.Optimizer, dl, train=True, enable_tqdm=True):
-    _iter = tqdm(enumerate(dl)) if enable_tqdm else enumerate(dl)
+    total_batches = len(dl)
+    _iter = tqdm(enumerate(dl), total=total_batches) if enable_tqdm else enumerate(dl)
     model.train(train)
     total_loss = 0
-    total_batches = len(dl)
     for i, batch in _iter:
         step_prc = int(i/(total_batches) * 100)
         x, y = batch[0].to(config.device), batch[1].to(config.device)
