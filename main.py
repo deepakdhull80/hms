@@ -1,4 +1,5 @@
 import os
+import argparse
 import torch
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -9,6 +10,11 @@ from common.dataloader import getDataLoader
 from common.trainer import per_epoch
 
 config = ConfigV1
+
+def parser():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--data_path", default=None)
+    return parser.parse_args()
 
 def training_env(train_df, val_df, env_no=1):
     dirs = os.path.dirname(os.path.realpath(__file__))
@@ -31,10 +37,12 @@ def training_env(train_df, val_df, env_no=1):
             print(f"*** Model Checkpoint Saved. ***\ncur_loss = {val_loss}\nglobal_loss = {global_loss}")
             global_loss = val_loss
 
-def run():
+def run(args):
+    config.data.data_prefix = args.data_path if args.data_path else config.data.data_prefix
     df = pd.read_csv(os.path.join(config.data.data_prefix, config.data.meta_file_name))
     train, val = train_test_split(df, train_size=config.trainer_config.train_size)    
     training_env(train, val, env_no=0)
 
 if __name__ == '__main__':
-    run()
+    args = parser()
+    run(args)
