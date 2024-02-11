@@ -1,0 +1,9 @@
+pandas
+pyarrow
+fastparquet
+librosa
+numpy
+matplotlib
+torch
+torchvision
+torchmetrics
