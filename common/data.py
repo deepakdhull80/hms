@@ -2,12 +2,9 @@ import numpy as np
 import pandas as pd
 import torch
 from torch.utils import data
+from torchvision import transforms
 
 from config.config import ConfigV1
-# try:
-#     from config.config import ConfigV1
-# except:
-#     from ..config.config import ConfigV1
 
 class Datasetv1(data.Dataset):
     """### Datasetv1 dataset for only kaggle spectrogram
@@ -18,6 +15,13 @@ class Datasetv1(data.Dataset):
         self.config = config
         self.df = df
         # self.cache = dict()
+        self._transform = transforms.Compose([
+            transforms.Resize(size=self.config.data.image_size),
+        ])
+    
+    def transform(self, spec):
+        #TODO scaling spectrogram require
+        return self._transform(spec)
 
     def scales_spectrogram(self, spectrogram):
         _spec = np.clip(spectrogram, np.exp(-4), np.exp(8))
@@ -33,6 +37,7 @@ class Datasetv1(data.Dataset):
         # else:
         
         spec_df = pd.read_parquet(f"{self.config.data.data_prefix}/{self.config.data.kaggle_spec_folder}/{spectrogram_id}.parquet")
+        spec_df.fillna(-1, inplace=True)
         
         spec = spec_df.loc[(spec_df.time>=spectrogram_label_offset_seconds)
                      &(spec_df.time<spectrogram_label_offset_seconds+600)].iloc[:, 1:].T.values
@@ -43,6 +48,7 @@ class Datasetv1(data.Dataset):
         kaggle_spec_n_bins = 100
         bins, time = spec.shape
         spec = spec.reshape(bins//kaggle_spec_n_bins, kaggle_spec_n_bins, time)
+        
         return torch.from_numpy(spec)
     
     def prepare_y(self, row):
