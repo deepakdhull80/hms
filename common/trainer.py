@@ -7,6 +7,7 @@ def per_epoch(config: ConfigV1, model: torch.nn.Module, optimizer:torch.optim.Op
     _iter = tqdm(enumerate(dl), total=total_batches) if enable_tqdm else enumerate(dl)
     model.train(train)
     total_loss = 0
+    c = 1
     for i, batch in _iter:
         step_prc = int(i/(total_batches) * 100)
         x, y = batch[0].to(config.device), batch[1].to(config.device)
@@ -25,7 +26,8 @@ def per_epoch(config: ConfigV1, model: torch.nn.Module, optimizer:torch.optim.Op
         if enable_tqdm:
             _iter.set_description(log)
         else:
-            if step_prc % config.trainer_config.step_perc_v == 0:
+            if step_prc != c and step_prc % config.trainer_config.step_perc_v == 0:
                 print(f"step({step_prc}%) :{log}")
+                c = step_prc
     
     return total_loss/len(dl)
