@@ -17,6 +17,8 @@ def parser():
     parser.add_argument("--device", default="cpu")
     parser.add_argument("--epoch", default=4)
     parser.add_argument("--tqdm", type=bool, default=True)
+    parser.add_argument("--batch_size", type=int, default=32)
+    
     return parser.parse_args()
 
 def training_env(train_df, val_df, env_no=1):
@@ -45,6 +47,7 @@ def run(args):
     config.device = torch.device(args.device)
     config.trainer_config.tqdm = args.tqdm
     config.trainer_config.epoch = args.epoch
+    config.trainer_config.batch_size = args.batch_size
     
     df = pd.read_csv(os.path.join(config.data.data_prefix, config.data.meta_file_name))
     train, val = train_test_split(df, train_size=config.trainer_config.train_size)    
