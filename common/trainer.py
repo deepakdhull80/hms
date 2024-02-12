@@ -19,7 +19,7 @@ def per_epoch(config: ConfigV1, model: torch.nn.Module, optimizer:torch.optim.Op
             loss.backward()
             optimizer.step()
         else:
-            loss: torch.Tensor = model(x, y).cpu().item()
+            loss: torch.Tensor = model(x, y)
         
         loss = loss.detach().cpu().item()
         total_loss += loss
