@@ -17,7 +17,8 @@ def parser():
     parser.add_argument("--epoch", default=4)
     parser.add_argument("--tqdm", action='store_true')
     parser.add_argument("--batch_size", type=int, default=32)
-    parser.add_argument("--submission_export_path") 
+    parser.add_argument("--submission_export_path")
+    parser.add_argument("--model_state_dict_path")
     
     return parser.parse_args()
 
@@ -39,7 +40,11 @@ def run(args):
     config.trainer_config.tqdm = args.tqdm
     config.trainer_config.epoch = args.epoch
     config.trainer_config.batch_size = args.batch_size
-    config.submission_export_path = args.submission_export_path if args.submission_export_path is not None else config.submission_export_path
+    
+    if args.submission_export_path:
+        config.submission_export_path = args.submission_export_path
+    if args.model_state_dict_path:
+        config.model_state_dict_path = args.model_state_dict_path
     
     df = pd.read_csv(os.path.join(config.data.data_prefix, config.data.test_meta_file_name))
     
