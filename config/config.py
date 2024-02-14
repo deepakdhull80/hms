@@ -12,6 +12,7 @@ class DataConfig:
 class ModelConfig:
     conv_in_channels: int = 4
     model_clazz: str = "models.backbone.EfficientNet_S"
+    load_pretrained_weights: bool = False
 
 class TrainerConfig:
     batch_size: int = 32
