@@ -11,7 +11,7 @@ class DataConfig:
 
 class ModelConfig:
     conv_in_channels: int = 4
-    model_clazz: str = "models.backbone.EfficientNet_M"
+    model_clazz: str = "models.backbone.EfficientNet_S"
     load_pretrained_weights: bool = True
 
 class TrainerConfig:
@@ -27,6 +27,7 @@ class TrainerConfig:
     
 
 class ConfigV1:
+    random_state_seed: int = 1997
     data = DataConfig
     model = ModelConfig
     trainer_config = TrainerConfig
