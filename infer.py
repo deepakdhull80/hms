@@ -45,6 +45,7 @@ def run(args):
         config.submission_export_path = args.submission_export_path
     if args.model_state_dict_path:
         config.model_state_dict_path = args.model_state_dict_path
+        config.model.load_pretrained_weights = False
     
     df = pd.read_csv(os.path.join(config.data.data_prefix, config.data.test_meta_file_name))
     
