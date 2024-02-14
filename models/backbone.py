@@ -21,8 +21,8 @@ class EfficientNet(BaseBackbone):
     def __init__(self, config:ConfigV1) -> None:
         super().__init__()
         self.backbone = None
-        # self.loss_fn = nn.KLDivLoss(reduction="batchmean")
-        self.loss_fn = nn.SmoothL1Loss()
+        self.loss_fn = nn.KLDivLoss(reduction="batchmean")
+        # self.loss_fn = nn.SmoothL1Loss()
     
     def modify_model(self):
         assert isinstance(self.backbone,nn.Module), "Backbone should be a nn.Module and Efficientnet"
