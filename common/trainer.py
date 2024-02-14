@@ -39,7 +39,7 @@ def per_epoch(config: ConfigV1, model: torch.nn.Module, optimizer:torch.optim.Op
 def inference(config: ConfigV1, model: torch.nn.Module, ds: DataLoader, enable_tqdm=True) -> np.ndarray:
     
     total_batches = len(ds)
-    _iter = tqdm(enumerate(ds), total=total_batches) if enable_tqdm else enumerate(ds)
+    _iter = enumerate(ds)
     model.train(False)
     result = np.zeros((total_batches, len(config.class_columns)), dtype=np.float32)
     with torch.no_grad():
@@ -48,4 +48,5 @@ def inference(config: ConfigV1, model: torch.nn.Module, ds: DataLoader, enable_t
             x = batch[0].to(config.device)
             prob = model(x).softmax(dim=-1)
             result[i*config.trainer_config.batch_size: (i+1)*config.trainer_config.batch_size, :] = prob.cpu().numpy()
+            print(f"Batch: {i} and size: {config.trainer_config.batch_size} completed, time taken: {time()-strt_time}")
     return result
