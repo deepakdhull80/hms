@@ -71,6 +71,6 @@ class EfficientNet_S(EfficientNet):
 class EfficientNet_M(EfficientNet):
     def __init__(self, config: ConfigV1) -> None:
         super().__init__(config)
-        self.backbone = torchvision.models.efficientnet_v2_s(torchvision.models.EfficientNet_V2_S_Weights) \
-            if config.model.load_pretrained_weights else torchvision.models.efficientnet_v2_s()
+        self.backbone = torchvision.models.efficientnet_v2_m(torchvision.models.EfficientNet_V2_M_Weights) \
+            if config.model.load_pretrained_weights else torchvision.models.efficientnet_v2_m()
         self.modify_model()

@@ -9,6 +9,7 @@ class Classifier(nn.Module):
     def __init__(self, config: ConfigV1):
         super().__init__()
         self.config = config
+        print("Model clazz:", config.model.model_clazz)
         self.model: BaseBackbone = my_import(config.model.model_clazz)(config)
     
     def forward(self, x, y = None):
