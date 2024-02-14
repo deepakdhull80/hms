@@ -2,8 +2,11 @@ import torch
 class DataConfig:
     data_prefix: str = "/Users/deepak.dhull/practice/kaggle/HMS/data"
     kaggle_spec_folder: str = "train_spectrograms"
+    kaggle_test_spec_folder: str = "test_spectrograms"
     eeg_folder: str = "train_eegs"
+    eeg_test_folder: str = "test_eegs"
     meta_file_name: str = "train.csv"
+    test_meta_file_name: str = "test.csv"
     image_size: tuple = (512, 512)
 
 class ModelConfig:
@@ -30,3 +33,5 @@ class ConfigV1:
     cache: int = 20
     inference: bool = False
     class_columns: list = ['seizure_vote', 'lpd_vote', 'gpd_vote', 'lrda_vote', 'grda_vote', 'other_vote']
+    submission_export_path: str = "data"
+    model_state_dict_path: str = "checkpoints/model.ckpt"

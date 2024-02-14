@@ -19,3 +19,11 @@ class Classifier(nn.Module):
     
     def get_optim(self) -> torch.optim.Optimizer:
         return my_import(self.config.trainer_config.optim_clazz)(self.model.parameters(), lr=self.config.trainer_config.lr)
+    
+    def load_weights(self, weights_path: str):
+        # loading weights in cpu memory
+        static_dict = torch.load(weights_path, map_location=torch.device("cpu"))
+        _static_dict = {}
+        for k,v in static_dict.items():
+            _static_dict[k.replace("model.", "")] = v
+        print(self.model.load_state_dict(_static_dict))

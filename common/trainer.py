@@ -1,9 +1,11 @@
+import numpy as np
 import torch
 from tqdm import tqdm
 from config.config import ConfigV1
 from time import time
+from torch.utils.data import Dataset, DataLoader
 
-def per_epoch(config: ConfigV1, model: torch.nn.Module, optimizer:torch.optim.Optimizer, dl, train=True, enable_tqdm=True):
+def per_epoch(config: ConfigV1, model: torch.nn.Module, optimizer:torch.optim.Optimizer, dl: DataLoader, train=True, enable_tqdm=True):
     total_batches = len(dl)
     _iter = tqdm(enumerate(dl), total=total_batches) if enable_tqdm else enumerate(dl)
     model.train(train)
@@ -33,3 +35,17 @@ def per_epoch(config: ConfigV1, model: torch.nn.Module, optimizer:torch.optim.Op
                 c = step_prc
     
     return total_loss/len(dl)
+
+def inference(config: ConfigV1, model: torch.nn.Module, ds: DataLoader, enable_tqdm=True) -> np.ndarray:
+    
+    total_batches = len(ds)
+    _iter = tqdm(enumerate(ds), total=total_batches) if enable_tqdm else enumerate(ds)
+    model.train(False)
+    result = np.zeros((total_batches, len(config.class_columns)), dtype=np.float32)
+    with torch.no_grad():
+        for i, batch in _iter:
+            strt_time = time()
+            x = batch[0].to(config.device)
+            prob = model(x).softmax(dim=-1)
+            result[i*config.trainer_config.batch_size: (i+1)*config.trainer_config.batch_size, :] = prob.cpu().numpy()
+    return result
