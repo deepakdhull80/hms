@@ -20,7 +20,7 @@ class TrainerConfig:
     pin_memory: bool = False
     optim_clazz: str = "torch.optim.Adam"
     lr: float = 0.001
-    epoch: int = 4
+    epoch: int = 10
     step_perc_v: int = 5
     tqdm: bool = True
     train_size: float = 0.8

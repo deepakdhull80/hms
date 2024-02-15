@@ -45,7 +45,7 @@ def training_env(train_df, val_df, env_no=1):
             global_loss = val_loss
 
 def infer_env(infer_df: pd.DataFrame):
-    solution_df = infer_df[['eeg_id'] + config.class_column].copy()
+    solution_df = infer_df[['eeg_id'] + config.class_columns].copy()
     dirs = os.path.dirname(os.path.realpath(__file__))
     checkpoint_dir = os.path.join(dirs, "runs", "checkpoints", f"infer")
     os.makedirs(checkpoint_dir, mode=777, exist_ok=True)
