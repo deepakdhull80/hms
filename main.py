@@ -71,6 +71,7 @@ def run(args):
     df = pd.read_csv(os.path.join(config.data.data_prefix, config.data.meta_file_name))
     train, val = train_test_split(df, train_size=config.trainer_config.train_size, random_state=config.random_state_seed)
     training_env(train, val, env_no=0)
+    infer_env(val)
 
 if __name__ == '__main__':
     args = parser()
