@@ -49,7 +49,7 @@ def infer_env(infer_df: pd.DataFrame):
     dirs = os.path.dirname(os.path.realpath(__file__))
     checkpoint_dir = os.path.join(dirs, "runs", "checkpoints", f"infer")
     os.makedirs(checkpoint_dir, mode=777, exist_ok=True)
-    ds = getInferDataLoader(config, infer_df)
+    ds = getDataLoader(config, infer_df)
     model = Classifier(config)
     model.load_weights(config.model_state_dict_path)
     model.to(config.device)
