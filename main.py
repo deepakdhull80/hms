@@ -46,6 +46,7 @@ def training_env(train_df, val_df, env_no=1):
 
 def infer_env(infer_df: pd.DataFrame, env_no):
     solution_df = infer_df[['eeg_id'] + config.class_columns].copy()
+    solution_df[config.class_columns] = torch.tensor(solution_df[config.class_columns].values).float().softmax(dim=-1).numpy()
     ds, _ = getDataLoader(config, infer_df)
     model = Classifier(config)
     model.load_weights(config.model_state_dict_path)
@@ -53,6 +54,8 @@ def infer_env(infer_df: pd.DataFrame, env_no):
     result = inference(config, model, ds, total_samples=infer_df.shape[0])
     infer_df[config.class_columns] = result
     submission_df = infer_df[['eeg_id'] + config.class_columns].copy()
+    submission_df.to_csv("data/tmp/sub.csv", index=False)
+    solution_df.to_csv("data/tmp/sol.csv", index=False)
     final_score = score(solution_df, submission_df, "eeg_id")
     print("********************************")
     print("submission_score: ", final_score)
@@ -67,8 +70,8 @@ def run(args):
     
     df = pd.read_csv(os.path.join(config.data.data_prefix, config.data.meta_file_name))
     train, val = train_test_split(df, train_size=config.trainer_config.train_size, random_state=config.random_state_seed)
-    # training_env(train, val, env_no=0)
-    infer_env(val.iloc[:70], env_no=0)
+    training_env(train, val, env_no=0)
+    infer_env(val, env_no=0)
 
 if __name__ == '__main__':
     args = parser()
