@@ -74,7 +74,7 @@ def run(args):
     config.trainer_config.batch_size = args.batch_size
     
     df = pd.read_csv(os.path.join(config.data.data_prefix, config.data.meta_file_name))
-    df = df.iloc[:100]
+
     stratify_split = StratifiedKFold(n_splits=config.k_folds, shuffle=True, random_state=config.random_state_seed,)
     train_logs = []
     for i, (train_idx, val_idx) in enumerate(stratify_split.split(df, df['expert_consensus'])):
