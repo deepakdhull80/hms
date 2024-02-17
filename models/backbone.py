@@ -47,13 +47,13 @@ class EfficientNet(BaseBackbone):
         )
         
     
-    def forward(self, x, y=None):
+    def forward(self, x:torch.Tensor, y: torch.Tensor=None):
         out = self.backbone(x)
         if y is None:
             return F.softmax(out, dim=-1)
         
         out = F.log_softmax(out, dim=-1)
-        y = F.softmax(y, dim=-1)
+        y = y / y.sum(dim=-1).unsqueeze(1)
         return self.loss_fn(out, y)
 
     @torch.no_grad()
