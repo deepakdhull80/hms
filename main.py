@@ -16,7 +16,7 @@ def parser():
     parser = argparse.ArgumentParser()
     parser.add_argument("--data_path", default=None)
     parser.add_argument("--device", default="cpu")
-    parser.add_argument("--epoch", default=4)
+    parser.add_argument("--epoch", default=config.trainer_config.epoch, type=int)
     parser.add_argument("--tqdm", action='store_true')
     parser.add_argument("--batch_size", type=int, default=32)
     
