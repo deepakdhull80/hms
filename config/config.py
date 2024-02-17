@@ -20,13 +20,14 @@ class TrainerConfig:
     pin_memory: bool = False
     optim_clazz: str = "torch.optim.Adam"
     lr: float = 0.001
-    epoch: int = 10
+    epoch: int = 3
     step_perc_v: int = 5
     tqdm: bool = True
     train_size: float = 0.8
     
 
 class ConfigV1:
+    k_folds: int = 2
     random_state_seed: int = 1997
     data = DataConfig
     model = ModelConfig

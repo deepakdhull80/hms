@@ -2,7 +2,8 @@ import os
 import argparse
 import torch
 import pandas as pd
-from sklearn.model_selection import train_test_split
+import json
+from sklearn.model_selection import train_test_split, StratifiedKFold
 
 from config.config import ConfigV1
 from models.base_model import Classifier
@@ -32,6 +33,7 @@ def training_env(train_df, val_df, env_no=1):
     model.to(config.device)
     optimizer = model.get_optim()
     global_loss = 1e3
+    chkpt_path = os.path.join(checkpoint_dir, "model.ckpt")
     for epoch in range(config.trainer_config.epoch):
         print("################################")
         print("Epoch: {}".format(epoch))
@@ -39,17 +41,21 @@ def training_env(train_df, val_df, env_no=1):
         val_loss = per_epoch(config, model, optimizer, val_dl, train=False, enable_tqdm=config.trainer_config.tqdm)
         
         if val_loss < global_loss:
-            torch.save(model.state_dict(), os.path.join(checkpoint_dir, "model.ckpt"))
-            config.model_state_dict_path = os.path.join(checkpoint_dir, "model.ckpt")
+            torch.save(model.state_dict(), chkpt_path)
+            config.model_state_dict_path = chkpt_path
             print(f"*** Model Checkpoint Saved. ***\ncur_loss = {val_loss}\nglobal_loss = {global_loss}")
             global_loss = val_loss
+    return global_loss, chkpt_path
 
 def infer_env(infer_df: pd.DataFrame, env_no):
     solution_df = infer_df[['eeg_id'] + config.class_columns].copy()
     solution_df[config.class_columns] = torch.tensor(solution_df[config.class_columns].values).float().softmax(dim=-1).numpy()
     ds, _ = getDataLoader(config, infer_df)
     model = Classifier(config)
-    model.load_weights(config.model_state_dict_path)
+    
+    dirs = os.path.dirname(os.path.realpath(__file__))
+    checkpoint_dir = os.path.join(dirs, "runs", "checkpoints", f"env_{env_no}")
+    model.load_weights(os.path.join(checkpoint_dir, "model.ckpt"))
     model.to(config.device)
     result = inference(config, model, ds, total_samples=infer_df.shape[0])
     infer_df[config.class_columns] = result
@@ -68,11 +74,22 @@ def run(args):
     config.trainer_config.batch_size = args.batch_size
     
     df = pd.read_csv(os.path.join(config.data.data_prefix, config.data.meta_file_name))
-    df = df
-    train, val = train_test_split(df, train_size=config.trainer_config.train_size, random_state=config.random_state_seed)
-    env_no = 0
-    training_env(train, val, env_no=env_no)
-    kl_loss = infer_env(val, env_no=env_no)
+    df = df.iloc[:100]
+    stratify_split = StratifiedKFold(n_splits=config.k_folds, shuffle=True, random_state=config.random_state_seed,)
+    train_logs = []
+    for i, (train_idx, val_idx) in enumerate(stratify_split.split(df, df['expert_consensus'])):
+        print(f"#Fold: {i}#")
+        train, val = df.iloc[train_idx], df.iloc[val_idx]
+        _loss, model_ckpt_path = training_env(train, val, env_no=i)
+        kl_loss = infer_env(val, env_no=i)
+        
+        train_logs.append({
+            'fold': i,
+            'kl_loss': kl_loss,
+            'model_path': model_ckpt_path
+        })
+    json.dump(train_logs, open(os.path.join(config.data.data_prefix, "runs/runner.logs"), 'w'))
+    print(train_logs)
 
 if __name__ == '__main__':
     args = parser()
