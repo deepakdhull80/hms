@@ -3,7 +3,7 @@ import argparse
 import torch
 import pandas as pd
 import json
-from sklearn.model_selection import train_test_split, StratifiedKFold
+from sklearn.model_selection import StratifiedKFold
 
 from config import ConfigV1
 from models.base_model import Classifier
@@ -38,8 +38,9 @@ def training_env(train_df, val_df, env_no=1):
         print("################################")
         print("Epoch: {}".format(epoch))
         train_loss = per_epoch(config, model, optimizer, train_dl, train=True, enable_tqdm=config.trainer_config.tqdm)
-        val_loss = per_epoch(config, model, optimizer, val_dl, train=False, enable_tqdm=config.trainer_config.tqdm)
-        
+        # val_loss = per_epoch(config, model, optimizer, val_dl, train=False, enable_tqdm=config.trainer_config.tqdm)
+        val_loss = infer_env(val_df, env_no, verbose=False)
+        print(f"********* CV: {val_loss} **************")
         if val_loss < global_loss:
             torch.save(model.state_dict(), chkpt_path)
             config.model_state_dict_path = chkpt_path
@@ -47,7 +48,7 @@ def training_env(train_df, val_df, env_no=1):
             global_loss = val_loss
     return global_loss, chkpt_path
 
-def infer_env(infer_df: pd.DataFrame, env_no):
+def infer_env(infer_df: pd.DataFrame, env_no, verbose:bool=True):
     solution_df = infer_df[['eeg_id'] + config.class_columns].copy()
     solution_df[config.class_columns] = torch.tensor(solution_df[config.class_columns].values).float().softmax(dim=-1).numpy()
     ds, _ = getDataLoader(config, infer_df)
@@ -57,7 +58,7 @@ def infer_env(infer_df: pd.DataFrame, env_no):
     checkpoint_dir = os.path.join(dirs, "runs", "checkpoints", f"env_{env_no}")
     model.load_weights(os.path.join(checkpoint_dir, "model.ckpt"))
     model.to(config.device)
-    result = inference(config, model, ds, total_samples=infer_df.shape[0])
+    result = inference(config, model, ds, total_samples=infer_df.shape[0], verbose=verbose)
     infer_df[config.class_columns] = result
     submission_df = infer_df[['eeg_id'] + config.class_columns].copy()
     final_score = score(solution_df, submission_df, "eeg_id")

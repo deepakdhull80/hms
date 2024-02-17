@@ -36,7 +36,7 @@ def per_epoch(config: ConfigV1, model: torch.nn.Module, optimizer:torch.optim.Op
     
     return total_loss/len(dl)
 
-def inference(config: ConfigV1, model: torch.nn.Module, ds: DataLoader, total_samples: int) -> np.ndarray:
+def inference(config: ConfigV1, model: torch.nn.Module, ds: DataLoader, total_samples: int, verbose:bool=True) -> np.ndarray:
     
     _iter = enumerate(ds)
     model.train(False)
@@ -48,5 +48,6 @@ def inference(config: ConfigV1, model: torch.nn.Module, ds: DataLoader, total_sa
             x = batch[0].to(config.device)
             prob = model(x).softmax(dim=-1)
             result[i*config.trainer_config.batch_size: min((i+1)*config.trainer_config.batch_size, total_samples), :] = prob.cpu().numpy()
-            print(f"Batch: {i} and size: {prob.shape} completed, time taken: {time()-strt_time}")
+            if verbose:
+                print(f"Batch: {i} and size: {prob.shape} completed, time taken: {time()-strt_time}")
     return result
