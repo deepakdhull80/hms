@@ -2,7 +2,7 @@ import torch
 import pandas as pd
 
 from common.data import Datasetv1
-from config.config import ConfigV1
+from config import ConfigV1
 from models.base_model import Classifier
 from common.utils import score
 

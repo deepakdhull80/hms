@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torchvision
 
-from config.config import ConfigV1
+from config import ConfigV1
 
 
 class BaseBackbone(nn.Module):

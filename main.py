@@ -5,7 +5,7 @@ import pandas as pd
 import json
 from sklearn.model_selection import train_test_split, StratifiedKFold
 
-from config.config import ConfigV1
+from config import ConfigV1
 from models.base_model import Classifier
 from common.dataloader import getDataLoader
 from common.trainer import per_epoch, inference

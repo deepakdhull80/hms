@@ -4,7 +4,7 @@ import torch
 from torch.utils import data
 from torchvision import transforms
 
-from config.config import ConfigV1
+from config import ConfigV1
 
 class Datasetv1(data.Dataset):
     """### Datasetv1 dataset for only kaggle spectrogram

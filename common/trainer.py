@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 from tqdm import tqdm
-from config.config import ConfigV1
+from config import ConfigV1
 from time import time
 from torch.utils.data import Dataset, DataLoader
 

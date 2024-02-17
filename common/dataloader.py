@@ -1,6 +1,6 @@
 import pandas as pd
 from torch.utils.data import DataLoader
-from config.config import ConfigV1
+from config import ConfigV1
 from common.data import Datasetv1, InferDatasetv1
 
 def getDataLoader(config: ConfigV1, train_df: pd.DataFrame, val_df: pd.DataFrame = None) -> list[DataLoader, DataLoader]:

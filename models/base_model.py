@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 
 from common.utils import my_import
-from config.config import ConfigV1
+from config import ConfigV1
 from models.backbone import BaseBackbone
 
 class Classifier(nn.Module):
