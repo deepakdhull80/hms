@@ -15,19 +15,19 @@ class ModelConfig:
     load_pretrained_weights: bool = True
 
 class TrainerConfig:
-    batch_size: int = 32
+    batch_size: int = 64
     num_workers: int = 1
     pin_memory: bool = False
     optim_clazz: str = "torch.optim.Adam"
     lr: float = 0.001
-    epoch: int = 3
+    epoch: int = 10
     step_perc_v: int = 5
     tqdm: bool = True
     train_size: float = 0.8
     
 
 class ConfigV1:
-    k_folds: int = 2
+    k_folds: int = 5
     random_state_seed: int = 1997
     data = DataConfig
     model = ModelConfig
