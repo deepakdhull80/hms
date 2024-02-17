@@ -68,9 +68,9 @@ def run(args):
     config.trainer_config.batch_size = args.batch_size
     
     df = pd.read_csv(os.path.join(config.data.data_prefix, config.data.meta_file_name))
-    df = df.iloc[:100]
+    df = df
     train, val = train_test_split(df, train_size=config.trainer_config.train_size, random_state=config.random_state_seed)
-    env_no = 1
+    env_no = 0
     training_env(train, val, env_no=env_no)
     kl_loss = infer_env(val, env_no=env_no)
 
