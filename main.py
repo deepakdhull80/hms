@@ -25,6 +25,7 @@ def parser():
     parser.add_argument("--batch_size", type=int, default=config.trainer_config.batch_size)
     return parser.parse_args()
 
+@torch.cuda.amp.autocast(dtype=config.trainer_config.precision)
 def training_env(train_df, val_df, env_no=1):
     dirs = os.path.dirname(os.path.realpath(__file__))
     checkpoint_dir = os.path.join(dirs, "runs", "checkpoints", f"env_{env_no}")
@@ -42,12 +43,7 @@ def training_env(train_df, val_df, env_no=1):
         print("################################")
         print("Epoch: {}".format(epoch))
         print("[TRAIN]")
-        if config.device.type == 'cpu':
-            per_epoch(config, model, optimizer, train_dl, train=True, enable_tqdm=config.trainer_config.tqdm)
-        else:
-            with torch.cuda.amp.autocast(dtype=config.trainer_config.precision):
-                per_epoch(config, model, optimizer, train_dl, train=True, enable_tqdm=config.trainer_config.tqdm)
-        
+        per_epoch(config, model, optimizer, train_dl, train=True, enable_tqdm=config.trainer_config.tqdm)
         print("[CV-loss]")
         val_loss = per_epoch(config, model, optimizer, val_dl, train=False, enable_tqdm=config.trainer_config.tqdm)
         print("[CV-Metric]")
