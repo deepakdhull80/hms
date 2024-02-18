@@ -21,8 +21,9 @@ class EfficientNet(BaseBackbone):
     def __init__(self, config:ConfigV1) -> None:
         super().__init__()
         self.backbone = None
-        self.loss_fn = nn.KLDivLoss(reduction="batchmean")
+        # self.loss_fn = nn.KLDivLoss(reduction="batchmean")
         # self.loss_fn = nn.SmoothL1Loss()
+        self.loss_fn = nn.CrossEntropyLoss()
     
     def modify_model(self):
         assert isinstance(self.backbone,nn.Module), "Backbone should be a nn.Module and Efficientnet"
@@ -52,8 +53,11 @@ class EfficientNet(BaseBackbone):
         if y is None:
             return F.softmax(out, dim=-1)
         
-        out = F.log_softmax(out, dim=-1)
-        y = y / y.sum(dim=-1).unsqueeze(1)
+        out = F.softmax(out, dim=-1)
+        
+        if isinstance(self.loss_fn, nn.KLDivLoss):
+            y = y / y.sum(dim=-1).unsqueeze(1)
+        
         return self.loss_fn(out, y)
 
     @torch.no_grad()
