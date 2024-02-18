@@ -22,7 +22,7 @@ def parser():
     parser.add_argument("--device", default="cpu")
     parser.add_argument("--epoch", default=config.trainer_config.epoch, type=int)
     parser.add_argument("--tqdm", action='store_true')
-    parser.add_argument("--batch_size", type=int, default=config.trainer_config.batch_size, type=int)
+    parser.add_argument("--batch_size", type=int, default=config.trainer_config.batch_size)
     return parser.parse_args()
 
 def training_env(train_df, val_df, env_no=1):
