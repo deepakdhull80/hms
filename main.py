@@ -2,6 +2,7 @@ import os
 import argparse
 import torch
 import pandas as pd
+import numpy as np
 import json
 from sklearn.model_selection import StratifiedKFold
 
@@ -17,11 +18,11 @@ config = ConfigV1
 def parser():
     parser = argparse.ArgumentParser()
     parser.add_argument("--data_path", default=None)
+    parser.add_argument("--spectrograms_npz_path", required=True)
     parser.add_argument("--device", default="cpu")
     parser.add_argument("--epoch", default=config.trainer_config.epoch, type=int)
     parser.add_argument("--tqdm", action='store_true')
-    parser.add_argument("--batch_size", type=int, default=32)
-    
+    parser.add_argument("--batch_size", type=int, default=config.trainer_config.batch_size, type=int)
     return parser.parse_args()
 
 def training_env(train_df, val_df, env_no=1):
@@ -88,12 +89,16 @@ def infer_env(infer_df: pd.DataFrame, env_no, verbose:bool=True, model: torch.nn
     return final_score
 
 
+def cache_spectrograms(spec_folder, save_path):
+    paths = os.listdir(spec_folder)
+    cache = {}
+    for path in paths:
+        _id = path.split("/")[-1].replace(".parquet", "")
+        spec = pd.read_parquet(f"{spec_folder}{path}")
+        cache[_id] = spec.to_numpy()
+    np.savez(f"{save_path}/spectrograms.npz", **cache)
+
 def run(args):
-    config.data.data_prefix = args.data_path if args.data_path else config.data.data_prefix
-    config.device = torch.device(args.device)
-    config.trainer_config.tqdm = args.tqdm
-    config.trainer_config.epoch = args.epoch
-    config.trainer_config.batch_size = args.batch_size
     
     df = pd.read_csv(os.path.join(config.data.data_prefix, config.data.meta_file_name))
     df = preprocess_data(df, config)
@@ -115,4 +120,13 @@ def run(args):
 
 if __name__ == '__main__':
     args = parser()
+    config.data.data_prefix = args.data_path if args.data_path else config.data.data_prefix
+    config.data.spectrograms_npz_path = args.spectrograms_npz_path if args.spectrograms_npz_path else config.data.spectrograms_npz_path
+    config.device = torch.device(args.device)
+    config.trainer_config.tqdm = args.tqdm
+    config.trainer_config.epoch = args.epoch
+    config.trainer_config.batch_size = args.batch_size
+    
+    if not os.path.exists(f"{config.data.spectrograms_npz_path}/spectrograms.npz"):
+        cache_spectrograms(f"{config.data.data_prefix}/train_spectrograms/", config.data.spectrograms_npz_path)
     run(args)

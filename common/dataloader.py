@@ -8,7 +8,7 @@ from common.data import Datasetv1, InferDatasetv1
 from common.data_v2 import Datasetv2, InferDatasetv2
 
 def getDataLoader(config: ConfigV1, train_df: pd.DataFrame, val_df: pd.DataFrame = None) -> list[DataLoader, DataLoader]:
-    spectrograms = np.load(os.path.join(config.data.data_prefix, 'spectrograms.npz'), allow_pickle=True)
+    spectrograms = np.load(os.path.join(config.data.spectrograms_npz_path, 'spectrograms.npz'), allow_pickle=True)
     
     train_ds = Datasetv1(train_df, config) if config.version == 'v1' else Datasetv2(train_df, config, spectrograms, mode='train')
     val_ds = None

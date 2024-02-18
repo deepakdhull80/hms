@@ -8,6 +8,7 @@ class DataConfig:
     meta_file_name: str = "train.csv"
     test_meta_file_name: str = "test.csv"
     image_size: tuple = (512, 512)
+    spectrograms_npz_path: str = ""
 
 class ModelConfig:
     conv_in_channels: int = 3
