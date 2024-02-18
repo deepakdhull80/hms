@@ -45,7 +45,7 @@ def training_env(train_df, val_df, env_no=1):
         if config.device.type == 'cpu':
             per_epoch(config, model, optimizer, train_dl, train=True, enable_tqdm=config.trainer_config.tqdm)
         else:
-            with torch.autocast(device_type=config.device, dtype=config.trainer_config.precision):
+            with torch.cuda.amp.autocast(dtype=config.trainer_config.precision):
                 per_epoch(config, model, optimizer, train_dl, train=True, enable_tqdm=config.trainer_config.tqdm)
         
         print("[CV-loss]")
