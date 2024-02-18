@@ -21,6 +21,7 @@ class EfficientNet(BaseBackbone):
     def __init__(self, config:ConfigV1) -> None:
         super().__init__()
         self.backbone = None
+        self.config: ConfigV1 = config
         # self.loss_fn = nn.KLDivLoss(reduction="batchmean")
         # self.loss_fn = nn.SmoothL1Loss()
         self.loss_fn = nn.CrossEntropyLoss()
@@ -28,23 +29,26 @@ class EfficientNet(BaseBackbone):
     def modify_model(self):
         assert isinstance(self.backbone,nn.Module), "Backbone should be a nn.Module and Efficientnet"
         
-        layer = self.backbone.features.pop(0)
-        first_conv_blk: nn.Conv2d = layer.pop(0)
-        layer.insert(
-            0, nn.Conv2d(
-                ConfigV1.model.conv_in_channels, 
-                first_conv_blk.out_channels, 
-                kernel_size = first_conv_blk.kernel_size,
-                stride = first_conv_blk.stride,
-                padding = first_conv_blk.padding,
-                bias = first_conv_blk.bias
+        if self.config.model.conv_in_channels != 3:
+            layer = self.backbone.features.pop(0)
+            first_conv_blk: nn.Conv2d = layer.pop(0)
+            layer.insert(
+                0, nn.Conv2d(
+                    self.config.model.conv_in_channels, 
+                    first_conv_blk.out_channels, 
+                    kernel_size = first_conv_blk.kernel_size,
+                    stride = first_conv_blk.stride,
+                    padding = first_conv_blk.padding,
+                    bias = first_conv_blk.bias
+                    )
                 )
-            )
-        self.backbone.features.insert(0, layer)
+            self.backbone.features.insert(0, layer)
+        
         backbone_dim = self.backbone.classifier[-1].in_features
+        
         self.backbone.classifier = nn.Sequential(
             nn.Dropout(0.3),
-            nn.Linear(backbone_dim, len(ConfigV1.class_columns))
+            nn.Linear(backbone_dim, len(self.config.class_columns))
         )
         
     

@@ -95,7 +95,7 @@ def run(args):
     config.trainer_config.epoch = args.epoch
     config.trainer_config.batch_size = args.batch_size
     
-    df = pd.read_csv(os.path.join(config.data.data_prefix, config.data.meta_file_name)).iloc[:1000]
+    df = pd.read_csv(os.path.join(config.data.data_prefix, config.data.meta_file_name))
     df = preprocess_data(df, config)
     
     stratify_split = StratifiedKFold(n_splits=config.k_folds, shuffle=True, random_state=config.random_state_seed,)

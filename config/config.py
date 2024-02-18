@@ -10,7 +10,7 @@ class DataConfig:
     image_size: tuple = (512, 512)
 
 class ModelConfig:
-    conv_in_channels: int = 4
+    conv_in_channels: int = 3
     model_clazz: str = "models.backbone.EfficientNet_M"
     load_pretrained_weights: bool = True
 

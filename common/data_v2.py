@@ -55,7 +55,11 @@ class Datasetv2(data.Dataset):
         spec = spec[:, :, 22:-22]
         
         spec = np.pad(spec, ((0,0), (14, 14), (0,0)), constant_values=0)
-        return torch.from_numpy(spec)
+        spec = torch.from_numpy(spec)
+        k, bins, t = spec.shape
+        spec = spec.view(1, -1, t)
+        spec = torch.concat([spec, spec, spec], dim=0)
+        return spec
     
     def prepare_y(self, row):
         if self.config.inference:
