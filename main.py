@@ -18,7 +18,7 @@ config = ConfigV1
 def parser():
     parser = argparse.ArgumentParser()
     parser.add_argument("--data_path", default=None)
-    parser.add_argument("--spectrograms_npz_path", required=True)
+    parser.add_argument("--spectrograms_npz_path", default=None)
     parser.add_argument("--device", default="cpu")
     parser.add_argument("--epoch", default=config.trainer_config.epoch, type=int)
     parser.add_argument("--tqdm", action='store_true')
@@ -121,12 +121,13 @@ def run(args):
 if __name__ == '__main__':
     args = parser()
     config.data.data_prefix = args.data_path if args.data_path else config.data.data_prefix
-    config.data.spectrograms_npz_path = args.spectrograms_npz_path if args.spectrograms_npz_path else config.data.spectrograms_npz_path
+    config.data.spectrograms_npz_path = args.spectrograms_npz_path
     config.device = torch.device(args.device)
     config.trainer_config.tqdm = args.tqdm
     config.trainer_config.epoch = args.epoch
     config.trainer_config.batch_size = args.batch_size
     
-    if not os.path.exists(f"{config.data.spectrograms_npz_path}/spectrograms.npz"):
+    if config.data.spectrograms_npz_path is not None and\
+        not os.path.exists(f"{config.data.spectrograms_npz_path}/spectrograms.npz"):
         cache_spectrograms(f"{config.data.data_prefix}/train_spectrograms/", config.data.spectrograms_npz_path)
     run(args)

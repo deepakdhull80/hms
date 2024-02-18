@@ -32,7 +32,9 @@ class Datasetv2(data.Dataset):
     def prepare_x(self, row):
         spectrogram_id = row['spec_id']
         # spectrogram_label_offset_seconds = int(row['spectrogram_label_offset_seconds'])
-        spec: np.ndarray = self.spectograms[str(spectrogram_id)]
+        spec: np.ndarray = self.spectograms[str(spectrogram_id)] if self.spectograms is not None\
+            else pd.read_parquet(f"{self.config.data.data_prefix}/{self.config.data.kaggle_spec_folder}/{spectrogram_id}.parquet").values
+        
         if self.mode=='train':
             # RANDOM CROPS FOR TRAIN
             r = np.random.randint(row['min'], row['max']+1)//2
