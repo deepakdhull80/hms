@@ -1,8 +1,12 @@
+import sys
 import os
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
 from config.config import ConfigV1
+
+if len(sys.argv) > 1:
+    ConfigV1.data.data_prefix = sys.argv[1]
 
 folder = f"{ConfigV1.data.data_prefix}/train_spectrograms/"
 paths = os.listdir(folder)
